@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_request_form_inherit_dept_approve" model="ir.ui.view">
+        <field name="name">purchase.request.form.inherit.dept.approve</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="replace">
+                <field name="state" widget="statusbar" statusbar_visible="draft,to_be_dept_approved,to_be_approved,approved,in_progress,done"/>
+            </xpath>
+
+            <!-- 2. Add the new 'Department Approve' button in the header -->
+            <xpath expr="//header" position="inside">
+                <button name="button_dept_approve"
+                        type="object"
+                        string="Department Approve"
+                        class="oe_highlight"
+                        invisible="state != 'to_be_dept_approved'"
+                        groups="purchase_request_department_approval.group_purchase_request_department_manager"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

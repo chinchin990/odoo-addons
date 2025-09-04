@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit the form view of purchase requests -->
+        <record id="view_purchase_request_form_inherit_custom" model="ir.ui.view">
+            <field name="name">purchase.request.form.inherit.custom</field>
+            <field name="model">purchase.request</field>
+            <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+            <field name="arch" type="xml">
+
+                <!-- 
+                    Part 1: Add the "Remark" field to the tree view of the product lines.
+                    The remark field is visible only to purchase managers.
+                -->
+                <xpath expr="//field[@name='line_ids']/tree/field[@name='purchased_qty']" position="after">
+                    <field name="x_remark" groups="purchase_request.group_purchase_request_manager"/>
+                </xpath>
+
+                <!-- 
+                    Part 2: Hide price fields from regular users.
+                    Only users in the 'purchase_request.group_purchase_request_manager' group can see them.
+                -->
+                
+                <!-- Hide the "Estimated Cost" column in the product lines -->
+                <xpath expr="//field[@name='line_ids']/tree/field[@name='estimated_cost']" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </xpath>
+
+                <!-- Hide the "Total" amount in the bottom right of the form -->
+                <xpath expr="//field[@name='estimated_cost'][@nolabel='1']" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </xpath>
+                
+                <!-- Hide the label in front of the "Total" amount -->
+                <xpath expr="//label[@for='estimated_cost']" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </xpath>
+
+                <!-- Hide the "show details" button from regular users -->
+                <xpath expr="//field[@name='line_ids']/tree//button[@name='action_show_details']" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- Inherit the original purchase_request_form_action record to modify the context -->
+        <record id="purchase_request.purchase_request_form_action" model="ir.actions.act_window">
+            <field name="context">{}</field>
+        </record>
+
+        <!-- Inherit the form view of purchase request lines (for editing lines individually) -->
+        <record id="view_purchase_request_line_form_inherit_custom" model="ir.ui.view">
+            <field name="name">purchase.request.line.form.inherit.custom</field>
+            <field name="model">purchase.request.line</field>
+            <field name="inherit_id" ref="purchase_request.purchase_request_line_form"/>
+            <field name="arch" type="xml">
+
+                <!-- Add the remark field after the purchased_qty field, visible only to purchase managers -->
+                <field name="purchased_qty" position="after">
+                    <field name="x_remark" groups="purchase_request.group_purchase_request_manager"/>
+                </field>
+
+                <!-- Hide the estimated_cost field -->
+                <field name="estimated_cost" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </field>
+
+            </field>
+        </record>
+
+        <!-- Inherit the tree view of purchase request lines (if there is a separate tree view) -->
+        <record id="view_purchase_request_line_tree_inherit_custom" model="ir.ui.view">
+            <field name="name">purchase.request.line.tree.inherit.custom</field>
+            <field name="model">purchase.request.line</field>
+            <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
+            <field name="arch" type="xml">
+
+                <!-- Add the remark field after the purchased_qty field, visible only to purchase managers -->
+                <field name="purchased_qty" position="after">
+                    <field name="x_remark" groups="purchase_request.group_purchase_request_manager"/>
+                </field>
+
+                <!-- Hide the estimated_cost field -->
+                <field name="estimated_cost" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </field>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

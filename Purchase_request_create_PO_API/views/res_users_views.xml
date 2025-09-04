@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_inherit_api_settings" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.api.settings</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Place the API settings in the "Preferences" tab for a cleaner look -->
+            <xpath expr="//page[@name='preferences']" position="inside">
+                <group string="Remote API Settings">
+                    <field name="x_api_url" placeholder="https://your-odoo-instance.com"/>
+                    <field name="x_api_db" placeholder="database_name"/>
+                    <field name="x_api_username" placeholder="api_user"/>
+                    <field name="x_api_password" placeholder="password_or_api_key"/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

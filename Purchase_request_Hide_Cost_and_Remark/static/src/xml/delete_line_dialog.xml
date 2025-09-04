@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="purchase_request_hide_cost_and_remark.DeleteLineDialog" owl="1">
+        <Dialog title="title" size="'md'">
+            <p><t t-esc="props.body"/></p>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="_onConfirm">OK</button>
+                <button class="btn btn-secondary" t-on-click="_onCancel">Cancel</button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

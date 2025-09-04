@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Inherit the "Create RFQ" wizard view -->
+    <record id="view_purchase_request_line_make_purchase_order_inherit_remote" model="ir.ui.view">
+        <field name="name">purchase.request.line.make.purchase.order.form.inherit.remote</field>
+        <field name="model">purchase.request.line.make.purchase.order</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_line_make_purchase_order"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add our new fields below the "Supplier" field -->
+            <field name="supplier_id" position="after">
+                <group string="Remote Server Options" invisible="not is_remote_creation">
+                    <div class="alert alert-info" role="alert">
+                        <strong>Remote Creation:</strong> This will create the PO on your configured remote Odoo server.
+                        Make sure your user profile has API credentials configured.
+                    </div>
+                </group>
+                <group>
+                    <field name="is_remote_creation"/>
+                    <field name="remote_po_name" 
+                           placeholder="Optional: Enter existing PO name to add items to it"
+                           invisible="not is_remote_creation"/>
+                </group>
+            </field>
+            
+        </field>
+    </record>
+    
+</odoo>

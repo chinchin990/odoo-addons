@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Wizard Form View -->
+    <record id="view_purchase_request_create_po_wizard" model="ir.ui.view">
+        <field name="name">purchase.request.create.po.wizard.form</field>
+        <field name="model">purchase.request.create.po.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Purchase Order">
+                <group>
+                    <group>
+                        <field name="is_remote_creation"/>
+                        <field name="remote_po_name" invisible="not is_remote_creation" placeholder="Optional custom PO name"/>
+                    </group>
+                    <group>
+                        <field name="purchase_request_ids" widget="many2many_tags" readonly="1"/>
+                    </group>
+                </group>
+                
+                <!-- Display current user's API configuration status -->
+                <group string="API Configuration Status" invisible="not is_remote_creation">
+                    <div class="alert alert-info" role="alert">
+                        <p>
+                            <strong>Remote API Settings:</strong><br/>
+                            Make sure your user profile has been configured with remote API credentials 
+                            in Settings → Users → Your User → Preferences → Remote API Settings.
+                        </p>
+                    </div>
+                </group>
+
+                <footer>
+                    <button name="action_create_purchase_order" type="object" string="Create PO" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard Action -->
+    <record id="action_purchase_request_create_po_wizard" model="ir.actions.act_window">
+        <field name="name">Create Purchase Order</field>
+        <field name="res_model">purchase.request.create.po.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_purchase_request_create_po_wizard"/>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Add action button to the purchase request list view -->
+    <record id="purchase_request_tree_inherit_create_po" model="ir.ui.view">
+        <field name="name">purchase.request.tree.inherit.create.po</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="js_class">purchase_request_tree_create_po</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Server Action: Bulk Create PO -->
+    <record id="server_action_create_po_from_requests" model="ir.actions.server">
+        <field name="name">Create Purchase Order</field>
+        <field name="model_id" ref="purchase_request.model_purchase_request"/>
+        <field name="binding_model_id" ref="purchase_request.model_purchase_request"/>
+        <field name="state">code</field>
+        <field name="code">
+# Open the wizard
+wizard = env['purchase.request.create.po.wizard'].create({
+    'purchase_request_ids': [(6, 0, records.ids)]
+})
+
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Create Purchase Order',
+    'res_model': 'purchase.request.create.po.wizard',
+    'res_id': wizard.id,
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {'default_purchase_request_ids': [(6, 0, records.ids)]}
+}
+        </field>
+    </record>
+
+</odoo>

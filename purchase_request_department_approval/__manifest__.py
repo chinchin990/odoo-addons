@@ -11,7 +11,7 @@
     "license": "AGPL-3",
     "depends": [
         "purchase_request",
-        "user_pr_prefix",
+        "purchase_request_user_pr_prefix",
     ],
     "data": [
         "security/security.xml",

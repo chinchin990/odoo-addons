@@ -11,6 +11,13 @@
             </xpath>
 
             <xpath expr="//header" position="inside">
+                <button
+                    name="button_draft"
+                    type="object"
+                    string="Reset"
+                    invisible="state != 'to_be_dept_approved'"
+                    groups="purchase_request.group_purchase_request_user"
+                />
                 <button name="button_dept_approve"
                         type="object"
                         string="Department Approve"
@@ -21,4 +28,37 @@
 
         </field>
     </record>
+
+    <!-- Disable line add/edit in UI for PR Users and Department Managers -->
+    <record id="view_purchase_request_form_inherit_lines_lock_by_group" model="ir.ui.view">
+        <field name="name">purchase.request.form.inherit.lines.lock.by.group</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="create" groups="purchase_request.group_purchase_request_user">0</attribute>
+                <attribute name="edit" groups="purchase_request.group_purchase_request_user">0</attribute>
+                <attribute name="create" groups="purchase_request_department_approval.group_purchase_request_department_manager">0</attribute>
+                <attribute name="edit" groups="purchase_request_department_approval.group_purchase_request_department_manager">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Lock Purchase Request Line form editing for PR User and Dept Manager -->
+    <record id="purchase_request_line_form_lock_by_group" model="ir.ui.view">
+        <field name="name">purchase.request.line.form.lock.by.group</field>
+        <field name="model">purchase.request.line</field>
+        <field name="inherit_id" ref="purchase_request.purchase_request_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="edit" groups="purchase_request.group_purchase_request_user">0</attribute>
+                <attribute name="create" groups="purchase_request.group_purchase_request_user">0</attribute>
+                <attribute name="duplicate" groups="purchase_request.group_purchase_request_user">0</attribute>
+                <attribute name="edit" groups="purchase_request_department_approval.group_purchase_request_department_manager">0</attribute>
+                <attribute name="create" groups="purchase_request_department_approval.group_purchase_request_department_manager">0</attribute>
+                <attribute name="duplicate" groups="purchase_request_department_approval.group_purchase_request_department_manager">0</attribute>
+            </xpath>
+        </field>
+    </record>
 </odoo>
+

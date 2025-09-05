@@ -1,93 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Inherit the form view of purchase requests -->
+        <!-- 继承采购申请的表单视图 -->
         <record id="view_purchase_request_form_inherit_custom" model="ir.ui.view">
             <field name="name">purchase.request.form.inherit.custom</field>
             <field name="model">purchase.request</field>
             <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+            <!-- 增加优先级，确保此视图修改在其他同级修改之后应用 -->
+            <field name="priority">99</field>
             <field name="arch" type="xml">
 
-                <!-- 
-                    Part 1: Add the "Remark" field to the tree view of the product lines.
-                    The remark field is visible only to purchase managers.
-                -->
+                <!-- 1. 在产品行的“已采购数量”后添加“备注”字段 -->
+                <!--    使用 groups 属性，让此字段仅对“采购申请经理”组的用户可见 -->
                 <xpath expr="//field[@name='line_ids']/tree/field[@name='purchased_qty']" position="after">
                     <field name="x_remark" groups="purchase_request.group_purchase_request_manager"/>
                 </xpath>
 
-                <!-- 
-                    Part 2: Hide price fields from regular users.
-                    Only users in the 'purchase_request.group_purchase_request_manager' group can see them.
-                -->
-                
-                <!-- Hide the "Estimated Cost" column in the product lines -->
+                <!-- 2. 隐藏成本和价格相关信息 -->
+                <!--    优化：不再使用多个 invisible 属性，而是直接用 groups 属性指定只有采购经理能看到这些元素 -->
+
+                <!-- 隐藏产品行的“预计成本”列 -->
                 <xpath expr="//field[@name='line_ids']/tree/field[@name='estimated_cost']" position="attributes">
                     <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
                 </xpath>
 
-                <!-- Hide the "Total" amount in the bottom right of the form -->
+                <!-- 隐藏表单底部的“预计成本”总计金额 -->
                 <xpath expr="//field[@name='estimated_cost'][@nolabel='1']" position="attributes">
                     <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
                 </xpath>
-                
-                <!-- Hide the label in front of the "Total" amount -->
+
+                <!-- 隐藏“预计成本”总计的标签 -->
                 <xpath expr="//label[@for='estimated_cost']" position="attributes">
                     <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
                 </xpath>
 
-                <!-- Hide the "show details" button from regular users -->
+                <!-- 隐藏产品行的“Show Details”按钮 -->
                 <xpath expr="//field[@name='line_ids']/tree//button[@name='action_show_details']" position="attributes">
                     <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
                 </xpath>
 
+                <!-- 隐藏表单头部的“明细行 (Lines)”智能按钮 -->
+                <xpath expr="//button[@name='action_view_purchase_request_line']" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </xpath>
             </field>
         </record>
 
-        <!-- Inherit the original purchase_request_form_action record to modify the context -->
-        <record id="purchase_request.purchase_request_form_action" model="ir.actions.act_window">
-            <field name="context">{}</field>
-        </record>
-
-        <!-- Inherit the form view of purchase request lines (for editing lines individually) -->
+        <!-- 继承采购申请行的表单视图 -->
         <record id="view_purchase_request_line_form_inherit_custom" model="ir.ui.view">
             <field name="name">purchase.request.line.form.inherit.custom</field>
             <field name="model">purchase.request.line</field>
             <field name="inherit_id" ref="purchase_request.purchase_request_line_form"/>
             <field name="arch" type="xml">
-
-                <!-- Add the remark field after the purchased_qty field, visible only to purchase managers -->
+                <!-- 添加备注字段，仅采购经理可见 -->
                 <field name="purchased_qty" position="after">
                     <field name="x_remark" groups="purchase_request.group_purchase_request_manager"/>
                 </field>
-
-                <!-- Hide the estimated_cost field -->
+                <!-- 隐藏预计成本字段，仅采购经理可见 -->
                 <field name="estimated_cost" position="attributes">
                     <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
                 </field>
-
             </field>
         </record>
 
-        <!-- Inherit the tree view of purchase request lines (if there is a separate tree view) -->
+        <!-- 继承采购申请行的列表视图 -->
         <record id="view_purchase_request_line_tree_inherit_custom" model="ir.ui.view">
             <field name="name">purchase.request.line.tree.inherit.custom</field>
             <field name="model">purchase.request.line</field>
             <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
             <field name="arch" type="xml">
-
-                <!-- Add the remark field after the purchased_qty field, visible only to purchase managers -->
+                <!-- 添加备注字段，仅采购经理可见 -->
                 <field name="purchased_qty" position="after">
                     <field name="x_remark" groups="purchase_request.group_purchase_request_manager"/>
                 </field>
-
-                <!-- Hide the estimated_cost field -->
+                <!-- 隐藏预计成本字段，仅采购经理可见 -->
                 <field name="estimated_cost" position="attributes">
                     <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
                 </field>
-
+            </field>
+        </record>
+        
+        <!-- 继承采购申请关联的采购订单行视图，隐藏单价 -->
+        <record id="purchase_order_line_form2_sub_inherit_hide_price" model="ir.ui.view">
+            <field name="name">purchase.order.line.form2.hide.price</field>
+            <field name="model">purchase.order.line</field>
+            <field name="inherit_id" ref="purchase_request.purchase_order_line_form2_sub"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='price_unit']" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </xpath>
             </field>
         </record>
 
+        <record id="purchase_order_line_tree_sub_inherit_hide_price" model="ir.ui.view">
+            <field name="name">purchase.order.line.tree.hide.price</field>
+            <field name="model">purchase.order.line</field>
+            <field name="inherit_id" ref="purchase_request.purchase_order_line_tree_sub"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='price_unit']" position="attributes">
+                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                </xpath>
+            </field>
+        </record>
+        
+        <!-- 这部分代码清空了原有动作的 context，如果不需要可以注释或删除 -->
+        <record id="purchase_request.purchase_request_form_action" model="ir.actions.act_window">
+            <field name="context">{}</field>
+        </record>
+        
     </data>
 </odoo>

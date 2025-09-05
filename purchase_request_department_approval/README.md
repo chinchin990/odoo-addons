@@ -1,47 +1,45 @@
 # Purchase Request Department Approval
 
-## 概述
+Department-level approval workflow for Odoo 17 Purchase Requests, based on each user's PR Prefix.
 
-本模块为 "Purchase Request" 工作流增加了一个基于部门的审批环节。它通过引入一个新的用户组和一个新的审批状态，实现了两级审批流程：先由部门经理审批，再由采购经理审批。部门的归属关系通过 `user_pr_prefix` 模块提供的 "PR Prefix" 字段来判断。
+## Overview
+This module adds an intermediate department approval step to OCA's Purchase Request. It introduces a new state, a new security group, and a record rule that isolates visibility by department using the PR Prefix field provided by the companion module `purchase_request_user_pr_prefix`.
 
-## 主要功能
+## Key Features
+- New state: `To be Dept. Approved` inserted between `Draft` and `To be Approved`.
+- New group: "Department Purchase Manager" for users who can perform department approval.
+- New button: "Department Approve" visible only to the above group when the request is in `To be Dept. Approved`.
+- Record rule: Department managers only see requests where the requester's PR Prefix equals their own, ensuring department data isolation.
 
-*   **新的审批流程**: 将采购申请的流程修改为:
-    `Draft` → **`To be Dept. Approved`** → `To be Approved` → `Approved`
-*   **新的用户组**:
-    *   **Department Purchase Manager**: 这是一个新的用户组，用于指定有权进行部门审批的用户（通常是部门经理）。
-*   **新的审批按钮**:
-    *   **Department Approve**: 此按钮仅在申请状态为 `To be Dept. Approved` 时，对 "Department Purchase Manager" 组的成员可见。
-*   **权限隔离**:
-    *   通过记录规则（Record Rule），"Department Purchase Manager" 只能看到与其自身拥有相同 "PR Prefix" 的采购申请，确保了部门间数据的隔离。
+## Workflow
+1. Draft → To be Dept. Approved → To be Approved → Approved.
+2. Regular users submit requests; they first require department approval.
+3. A Department Purchase Manager with the same PR Prefix approves at the department step.
+4. The standard Purchase Request approval follows afterwards.
 
-## 安装与配置
+## Installation
+Dependencies: `purchase_request`, `purchase_request_user_pr_prefix`.
 
-1.  **安装模块**:
-    *   将此模块 `purchase_request_department_approval` 放入您的 addons 路径。
-    *   在 Odoo 中，更新应用列表 (Update Apps List)。
-    *   搜索并安装 "Purchase Request Department Approval" 模块。它的依赖模块 `purchase_request` 和 `user_pr_prefix` 将被自动安装。
+- Install from Apps: enable Developer Mode → Update Apps List → search "Purchase Request Department Approval".
+- Or via command line: `-i purchase_request,purchase_request_user_pr_prefix,purchase_request_department_approval`.
 
-2.  **配置用户 "PR Prefix"**:
-    *   进入 `Settings > Users & Companies > Users`。
-    *   为您的每一位用户（包括普通员工和部门经理）设置 "PR Prefix" 字段。例如，销售部的员工和经理都设置为 `SALE`，技术部的都设置为 `TECH`。
+## Configuration
+1. Set PR Prefix per user: Settings > Users & Companies > Users → select a user → set "PR Prefix" (e.g., `SALE`, `TECH`).
+2. Assign department managers: Settings > Users & Companies > Groups → open "Department Purchase Manager" → add the appropriate users.
 
-3.  **分配用户组**:
-    *   进入 `Settings > Users & Companies > Groups`。
-    *   搜索并打开 **Department Purchase Manager** 用户组。
-    *   点击 "Add" 将您的所有部门经理添加至此用户组。
+## Usage Example
+1. A user with PR Prefix `SALE` creates and submits a purchase request; the state becomes "To be Dept. Approved".
+2. A manager in "Department Purchase Manager" who also has PR Prefix `SALE` opens the request and clicks "Department Approve"; the state moves to "To be Approved".
+3. The usual purchase manager approval proceeds next, ultimately leading to "Approved".
 
-## 使用流程
+## Security and Access
+- Group: "Department Purchase Manager" grants access to the department approval action.
+- Record Rule: limits visibility to requests where `requested_by.pr_prefix == user.pr_prefix`.
 
-1.  **创建申请**:
-    *   一个普通用户（例如，PR Prefix 为 `SALE`）创建并提交一份采购申请。
-    *   提交后，该申请的状态变为 **"To be Dept. Approved"**。
+## Notes
+- If your organization does not use PR Prefix for department partitioning, you can adapt the record rule and visibility logic to match your own department field.
+- Tested with Odoo 17 and OCA `purchase_request` 17.0.
 
-2.  **部门经理审批**:
-    *   一位 `SALE` 部门的经理（他/她必须属于 "Department Purchase Manager" 组，且自身的 PR Prefix 也为 `SALE`）登录系统。
-    *   在他/她的采购申请列表中，将能看到这份待审批的申请。他/她无法看到其他部门（如 `TECH` 部门）的申请。
-    *   打开这份申请，点击 **"Department Approve"** 按钮。
+## License
+AGPL-3
 
-3.  **采购经理审批**:
-    *   申请的状态变为 **"To be Approved"**。
-    *   此时，申请进入标准的采购审批流程，等待具有 "Purchase Request Manager" 权限的采购总管进行最终审批。

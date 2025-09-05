@@ -22,5 +22,62 @@
             <field name="perm_unlink" eval="1"/>
             <field name="domain_force">[('requested_by.pr_prefix', '=', user.pr_prefix)]</field>
         </record>
+
+        <!-- 2b. Tighten follower rule to same prefix for PR Users -->
+        <record id="purchase_request.purchase_request_followers_rule" model="ir.rule">
+            <field name="domain_force"><![CDATA[
+                ['|',
+                    ('requested_by','=',user.id),
+                    '&', ('message_partner_ids', 'in', [user.partner_id.id]),
+                         ('requested_by.pr_prefix', '=', user.pr_prefix)
+                ]
+            ]]></field>
+        </record>
+
+        <!-- 3. Prefix-based read for PR Users (department-wide read only) -->
+        <record id="purchase_request_user_prefix_read_rule" model="ir.rule">
+            <field name="name">Purchase Request: PR User prefix read</field>
+            <field name="model_id" ref="purchase_request.model_purchase_request"/>
+            <field name="groups" eval="[(4, ref('purchase_request.group_purchase_request_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+            <field name="domain_force">[('requested_by.pr_prefix', '=', user.pr_prefix)]</field>
+        </record>
+
+        <!-- 4. Lines: read-only by prefix for PR Users and Dept Managers -->
+        <record id="purchase_request_line_user_prefix_read_rule" model="ir.rule">
+            <field name="name">Purchase Request Line: PR User prefix read</field>
+            <field name="model_id" ref="purchase_request.model_purchase_request_line"/>
+            <field name="groups" eval="[(4, ref('purchase_request.group_purchase_request_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+            <field name="domain_force">[("request_id.requested_by.pr_prefix", "=", user.pr_prefix)]</field>
+        </record>
+
+        <!-- Tighten PR Line follower rule to same prefix for PR Users -->
+        <record id="purchase_request.purchase_request_line_followers_rule" model="ir.rule">
+            <field name="domain_force"><![CDATA[
+                ['|',
+                    ('request_id.requested_by','=',user.id),
+                    '&', ('request_id.message_partner_ids', 'in', [user.partner_id.id]),
+                         ('request_id.requested_by.pr_prefix', '=', user.pr_prefix)
+                ]
+            ]]></field>
+        </record>
+
+        <record id="purchase_request_line_dept_manager_prefix_read_rule" model="ir.rule">
+            <field name="name">Purchase Request Line: Dept Manager prefix read</field>
+            <field name="model_id" ref="purchase_request.model_purchase_request_line"/>
+            <field name="groups" eval="[(4, ref('group_purchase_request_department_manager'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+            <field name="domain_force">[("request_id.requested_by.pr_prefix", "=", user.pr_prefix)]</field>
+        </record>
     </data>
 </odoo>

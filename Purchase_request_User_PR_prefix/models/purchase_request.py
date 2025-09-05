@@ -21,7 +21,7 @@ class PurchaseRequest(models.Model):
             search_pattern = f"{prefix}{year}-"
             
             # Get the latest sequence number for the current year and user prefix
-            last_records = self.search(
+            last_records = self.sudo().search(
                 [('name', 'like', search_pattern)],
                 order='name desc',
                 limit=1
@@ -58,7 +58,7 @@ class PurchaseRequest(models.Model):
         This method can be called externally to preview the next number.
         """
         search_pattern = f"{prefix}{year}-"
-        last_records = self.search(
+        last_records = self.sudo().search(
             [('name', 'like', search_pattern)],
             order='name desc',
             limit=1

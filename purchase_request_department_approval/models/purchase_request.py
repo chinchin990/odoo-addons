@@ -143,7 +143,7 @@ class PurchaseRequestLine(models.Model):
         string="Unit Price",
         currency_field="currency_id",
         default=0.0,
-        tracking=True,
+        tracking=False,  # do not log unit price changes in chatter
         help="Unit price used to compute Total Price.",
     )
 
@@ -167,43 +167,44 @@ class PurchaseRequestLine(models.Model):
             line.estimated_cost = qty * price
 
     def write(self, vals):
-        # Capture changes to qty or unit price for audit log
+        # Only capture qty changes for audit log (no unit price logging)
         track_qty = "product_qty" in vals
-        track_price = "unit_price" in vals
         before = {}
-        if track_qty or track_price:
+        if track_qty:
             for rec in self:
-                before[rec.id] = {
-                    "qty": rec.product_qty,
-                    "price": rec.unit_price,
-                }
+                before[rec.id] = {"qty": rec.product_qty}
 
         res = super().write(vals)
 
-        if track_qty or track_price:
+        if track_qty:
             user_name = self.env.user.name
             for rec in self:
                 prev = before.get(rec.id, {})
                 changes = []
-                if track_qty and prev.get("qty") != rec.product_qty:
+                if prev.get("qty") != rec.product_qty:
                     changes.append(
-                        _("Qty: %(old)s -> %(new)s",
-                          old=prev.get("qty"), new=rec.product_qty)
-                    )
-                if track_price and prev.get("price") != rec.unit_price:
-                    changes.append(
-                        _("Unit Price: %(old)s -> %(new)s",
-                          old=prev.get("price"), new=rec.unit_price)
+                        _(
+                            "Qty: %(old)s -> %(new)s",
+                            old=prev.get("qty"),
+                            new=rec.product_qty,
+                        )
                     )
                 if changes:
                     body = _(
                         "%(user)s updated line %(line)s: %(changes)s",
                         user=user_name,
-                        line=(rec.display_name or rec.name or (rec.product_id and rec.product_id.display_name) or rec.id),
+                        line=(
+                            rec.display_name
+                            or rec.name
+                            or (rec.product_id and rec.product_id.display_name)
+                            or rec.id
+                        ),
                         changes="; ".join(changes),
                     )
                     if rec.request_id:
-                        rec.request_id.message_post(body=body, subtype_xmlid="mail.mt_note")
+                        rec.request_id.message_post(
+                            body=body, subtype_xmlid="mail.mt_note"
+                        )
                     else:
                         rec.message_post(body=body, subtype_xmlid="mail.mt_note")
         return res

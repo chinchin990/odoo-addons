@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Standalone Purchase Request Line tree: restrict unit_price to managers/system -->
+    <record id="purchase_request_line_tree_inherit_hide_unit_price" model="ir.ui.view">
+      <field name="name">purchase.request.line.tree.inherit.hide.unit.price</field>
+      <field name="model">purchase.request.line</field>
+      <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
+      <field name="priority" eval="210"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='unit_price']" position="attributes">
+          <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Standalone Purchase Request Line form: restrict unit_price to managers/system -->
+    <record id="purchase_request_line_form_inherit_hide_unit_price" model="ir.ui.view">
+      <field name="name">purchase.request.line.form.inherit.hide.unit.price</field>
+      <field name="model">purchase.request.line</field>
+      <field name="inherit_id" ref="purchase_request.purchase_request_line_form"/>
+      <field name="priority" eval="210"/>
+      <field name="arch" type="xml">
+        <xpath expr="//group[@name='settings']//field[@name='unit_price']" position="attributes">
+          <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
+

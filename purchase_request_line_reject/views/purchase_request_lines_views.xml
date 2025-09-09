@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="view_pr_line_tree_inherit_add_line_state_reject" model="ir.ui.view">
+    <field name="name">purchase.request.line.tree.add.line.state.reject</field>
+    <field name="model">purchase.request.line</field>
+    <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
+    <field name="arch" type="xml">
+      <!-- Add line_state badge after request_state -->
+      <xpath expr="//tree/field[@name='request_state']" position="after">
+        <field name="line_state" widget="badge"
+               decoration-info="line_state == 'normal'"
+               decoration-danger="line_state == 'rejected'"/>
+      </xpath>
+      <!-- Add Reject/Restore buttons at the beginning of each row -->
+      <xpath expr="//tree" position="inside">
+        <button name="action_reject_line"
+                type="object"
+                icon="fa-ban"
+                class="btn-secondary"
+                title="Reject"
+                groups="purchase_request.group_purchase_request_manager,base.group_system"
+                invisible="line_state == 'rejected'"/>
+        <button name="action_reset_line"
+                type="object"
+                icon="fa-refresh"
+                class="btn-secondary"
+                title="Restore"
+                groups="purchase_request.group_purchase_request_manager,base.group_system"
+                invisible="line_state != 'rejected'"/>
+      </xpath>
+      <!-- Add row-level decoration for rejected lines -->
+      <xpath expr="//tree" position="attributes">
+        <attribute name="decoration-danger">line_state == 'rejected'</attribute>
+      </xpath>
+    </field>
+  </record>
+</odoo>

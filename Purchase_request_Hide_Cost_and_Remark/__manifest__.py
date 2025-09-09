@@ -23,6 +23,7 @@
     ''',
     'data': [
         'views/purchase_request_views.xml',
+        'views/purchase_request_lines_views.xml',
     ],
     'installable': True,
     'application': False,

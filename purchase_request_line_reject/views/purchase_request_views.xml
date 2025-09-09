@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="view_purchase_request_form_inherit_line_reject_btn" model="ir.ui.view">
+    <field name="name">purchase.request.form.inherit.line.reject.btn</field>
+    <field name="model">purchase.request</field>
+    <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+    <field name="arch" type="xml">
+      <!-- Add Reject/Restore before Show Details in embedded lines tree -->
+      <xpath expr="//field[@name='line_ids']/tree/button[@name='action_show_details']" position="before">
+        <button name="action_reject_line"
+                type="object"
+                icon="fa-ban"
+                class="btn-secondary"
+                title="Reject"
+                groups="purchase_request.group_purchase_request_manager,base.group_system"
+                invisible="line_state == 'rejected'"/>
+        <button name="action_reset_line"
+                type="object"
+                icon="fa-refresh"
+                class="btn-secondary"
+                title="Restore"
+                groups="purchase_request.group_purchase_request_manager,base.group_system"
+                invisible="line_state != 'rejected'"/>
+      </xpath>
+      <!-- Show line_state badge after purchase_state -->
+      <xpath expr="//field[@name='line_ids']/tree/field[@name='purchase_state']" position="after">
+        <field name="line_state" widget="badge"
+               decoration-info="line_state == 'normal'"
+               decoration-danger="line_state == 'rejected'"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

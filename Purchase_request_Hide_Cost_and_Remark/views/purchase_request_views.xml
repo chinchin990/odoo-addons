@@ -21,30 +21,21 @@
 
                 <!-- 隐藏产品行的“预计成本”列 -->
                 <xpath expr="//field[@name='line_ids']/tree/field[@name='estimated_cost']" position="attributes">
-                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                    <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
                 </xpath>
                 <!-- Hide Unit Price from non-managers on PR form lines tree -->
                 <xpath expr="//field[@name='line_ids']/tree/field[@name='unit_price']" position="attributes">
-                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                    <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
                 </xpath>
 
                 <!-- 隐藏表单底部的“预计成本”总计金额 -->
                 <xpath expr="//field[@name='estimated_cost'][@nolabel='1']" position="attributes">
-                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                    <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
                 </xpath>
 
                 <!-- 隐藏“预计成本”总计的标签 -->
                 <xpath expr="//label[@for='estimated_cost']" position="attributes">
-                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
-                </xpath>
-
-                <!-- Explicitly hide the Unit Price label for non-managers on PR line form -->
-                <xpath expr="//label[@for='unit_price']" position="attributes">
                     <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
-                </xpath>
-                <!-- Fallback: if there is no label node, inject a manager-only label before field -->
-                <xpath expr="//group[@name='settings']//field[@name='unit_price']" position="before">
-                    <label for="unit_price" groups="purchase_request.group_purchase_request_manager,base.group_system"/>
                 </xpath>
 
                 <!-- 隐藏产品行的“Show Details”按钮 -->
@@ -72,11 +63,11 @@
                 </field>
                 <!-- 隐藏预计成本字段，仅采购经理可见 -->
                 <field name="estimated_cost" position="attributes">
-                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                    <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
                 </field>
                 <!-- Hide Unit Price from non-managers on PR line form -->
                 <field name="unit_price" position="attributes">
-                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                    <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
                 </field>
             </field>
         </record>
@@ -94,7 +85,7 @@
                 </field>
                 <!-- 隐藏预计成本字段，仅采购经理可见 -->
                 <field name="estimated_cost" position="attributes">
-                    <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
+                    <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
                 </field>
                 <!-- Note: Unit Price is not present in the base list view; no change needed here. -->
             </field>
@@ -108,10 +99,6 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='price_unit']" position="attributes">
                     <attribute name="groups">purchase_request.group_purchase_request_manager</attribute>
-                </xpath>
-                <!-- Hide Subtotal column and its header label for non-managers -->
-                <xpath expr="//field[@name='price_subtotal']" position="attributes">
-                    <attribute name="groups">purchase.group_purchase_manager,base.group_system</attribute>
                 </xpath>
             </field>
         </record>

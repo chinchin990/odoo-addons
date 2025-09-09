@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="my_module_purchase_request_line_tree_optional_columns" model="ir.ui.view">
+    <field name="name">purchase.request.line.tree.optional.columns</field>
+    <field name="model">purchase.request.line</field>
+    <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
+    <field name="arch" type="xml">
+
+      <!-- Example: request_id -->
+      <xpath expr="//tree/field[@name='request_id']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='request_state']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='requested_by']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='assigned_to']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='date_required']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='estimated_cost']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <!-- remove hard hide -->
+      <xpath expr="//tree/field[@name='currency_id']" position="attributes">
+        <attribute name="column_invisible"></attribute>
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='purchased_qty']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <!-- 删除原本的 purchase_state，避免重复 -->
+      <xpath expr="//tree/field[@name='purchase_state']" position="replace"/>
+
+      <xpath expr="//tree/field[@name='product_id']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='name']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='product_qty']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+
+      <!-- remove hard hide -->
+      <xpath expr="//tree/field[@name='product_uom_category_id']" position="attributes">
+        <attribute name="column_invisible"></attribute>
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='product_uom_id']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='analytic_distribution']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='supplier_id']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <xpath expr="//tree/field[@name='company_id']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <!-- remove hard hide -->
+      <xpath expr="//tree/field[@name='cancelled']" position="attributes">
+        <attribute name="column_invisible"></attribute>
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <!-- remove hard hide -->
+      <xpath expr="//tree/field[@name='qty_in_progress']" position="attributes">
+        <attribute name="column_invisible"></attribute>
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <!-- remove hard hide -->
+      <xpath expr="//tree/field[@name='qty_done']" position="attributes">
+        <attribute name="column_invisible"></attribute>
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <!-- remove hard hide -->
+      <xpath expr="//tree/field[@name='qty_cancelled']" position="attributes">
+        <attribute name="column_invisible"></attribute>
+        <attribute name="optional">hide</attribute>
+      </xpath>
+
+      <!-- add line_state -->
+      <xpath expr="//tree/field[@name='request_state']" position="after">
+        <field name="line_state" widget="badge"
+               decoration-info="line_state == 'normal'"
+               decoration-danger="line_state == 'rejected'"
+               optional="hide"/>
+      </xpath>
+
+      <!-- 在 line_state 后面插入 purchase_state -->
+      <xpath expr="//tree/field[@name='line_state']" position="after">
+        <field name="purchase_state" widget="badge"
+               decoration-success="purchase_state == 'done'"
+               decoration-muted="purchase_state == 'draft'"
+               decoration-info="purchase_state in ('sent', 'purchase')"
+               decoration-warning="purchase_state == 'to_approve'"
+               decoration-danger="purchase_state == 'cancelled'"
+               optional="show"/>
+      </xpath>
+
+    </field>
+  </record>
+</odoo>

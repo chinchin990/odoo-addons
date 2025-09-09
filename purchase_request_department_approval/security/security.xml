@@ -70,14 +70,19 @@
         </record>
 
         <record id="purchase_request_line_dept_manager_prefix_read_rule" model="ir.rule">
-            <field name="name">Purchase Request Line: Dept Manager prefix read</field>
+            <field name="name">Purchase Request Line: Dept Manager access by prefix or owner</field>
             <field name="model_id" ref="purchase_request.model_purchase_request_line"/>
             <field name="groups" eval="[(4, ref('group_purchase_request_department_manager'))]"/>
             <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="0"/>
-            <field name="perm_create" eval="0"/>
-            <field name="perm_unlink" eval="0"/>
-            <field name="domain_force">[("request_id.requested_by.pr_prefix", "=", user.pr_prefix)]</field>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force"><![CDATA[
+                ['|',
+                    ('request_id.requested_by.pr_prefix', '=', user.pr_prefix),
+                    ('request_id.requested_by', '=', user.id)
+                ]
+            ]]></field>
         </record>
     </data>
 </odoo>

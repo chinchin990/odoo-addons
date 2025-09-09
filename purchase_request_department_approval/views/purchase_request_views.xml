@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
 
             <xpath expr="//field[@name='state']" position="attributes">
-                <attribute name="statusbar_visible">draft,to_be_dept_approved,to_approve,approved,in_progress,done</attribute>
+                <attribute name="statusbar_visible">draft,to_be_dept_approved,to_purchasing_verify,to_approve,approved,in_progress,done</attribute>
             </xpath>
 
             <xpath expr="//header" position="inside">
@@ -24,8 +24,38 @@
                         class="oe_highlight"
                         invisible="state != 'to_be_dept_approved'"
                         groups="purchase_request_department_approval.group_purchase_request_department_manager"/>
+                <button name="button_purchasing_verify"
+                        type="object"
+                        string="Purchasing Verify"
+                        class="oe_highlight"
+                        invisible="state != 'to_purchasing_verify'"
+                        groups="purchase_request.group_purchase_request_manager"/>
             </xpath>
 
+            <!-- Show Approved Date after Creation Date -->
+            <xpath expr="//field[@name='date_start']" position="after">
+                <field name="approved_date" readonly="1"/>
+            </xpath>
+
+            <!-- Make Requested By always readonly (default is creator) -->
+            <xpath expr="//field[@name='requested_by']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Safe RFQ restriction: standalone inherit, match by button action -->
+    <record id="view_purchase_request_form_inherit_rfq_restrict" model="ir.ui.view">
+        <field name="name">purchase.request.form.inherit.rfq.restrict</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+        <field name="priority" eval="120"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@type='action' and contains(@name, 'action_purchase_request_line_make_purchase_order')]" position="attributes">
+                <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
+                <attribute name="attrs">{'invisible': [('state','not in',('approved','in_progress'))]}</attribute>
+            </xpath>
         </field>
     </record>
 
@@ -60,5 +90,77 @@
             </xpath>
         </field>
     </record>
-</odoo>
 
+    <!-- Inherit Purchase Request form: add Unit Price, rename Estimated Cost to Total Price, add Reason -->
+    <record id="view_purchase_request_form_inherit_prices_and_reason" model="ir.ui.view">
+        <field name="name">purchase.request.form.inherit.prices.reason</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+        <field name="priority" eval="100"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='product_qty']" position="after">
+                <field name="unit_price" widget="monetary"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='estimated_cost']" position="attributes">
+                <attribute name="string">Total Price</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='date_required']" position="after">
+                <field name="reason" optional="hide"/>
+            </xpath>
+            <xpath expr="//label[@for='estimated_cost']" position="attributes">
+                <attribute name="string">Total Price</attribute>
+            </xpath>
+            <xpath expr="//field[@name='estimated_cost' and @nolabel='1']" position="attributes">
+                <attribute name="string">Total Price</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Purchase Request Line form: add Unit Price, rename Total Price, add Reason -->
+    <record id="purchase_request_line_form_inherit_prices_reason" model="ir.ui.view">
+        <field name="name">purchase.request.line.form.inherit.prices.reason</field>
+        <field name="model">purchase.request.line</field>
+        <field name="inherit_id" ref="purchase_request.purchase_request_line_form"/>
+        <field name="priority" eval="100"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='settings']/field[@name='name']" position="after">
+                <field name="reason" readonly="is_editable == False"/>
+            </xpath>
+            <xpath expr="//group[@name='settings']//field[@name='estimated_cost']" position="before">
+                <field name="unit_price" widget="monetary" readonly="is_editable == False"/>
+            </xpath>
+            <xpath expr="//group[@name='settings']//field[@name='estimated_cost']" position="attributes">
+                <attribute name="string">Total Price</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Purchase Request Line tree: add Unit Price and rename Total Price -->
+    <record id="purchase_request_line_tree_inherit_prices" model="ir.ui.view">
+        <field name="name">purchase.request.line.tree.inherit.prices</field>
+        <field name="model">purchase.request.line</field>
+        <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
+        <field name="priority" eval="100"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_qty']" position="after">
+                <field name="unit_price" widget="monetary"/>
+            </xpath>
+            <xpath expr="//field[@name='estimated_cost']" position="attributes">
+                <attribute name="string">Total Price</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- PR Number readonly via view for PR User and Dept Manager -->
+    <record id="view_purchase_request_form_inherit_pr_number_readonly" model="ir.ui.view">
+        <field name="name">purchase.request.form.inherit.pr.number.readonly</field>
+        <field name="model">purchase.request</field>
+        <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+        <field name="priority" eval="110"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes" groups="purchase_request.group_purchase_request_user,purchase_request_department_approval.group_purchase_request_department_manager">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

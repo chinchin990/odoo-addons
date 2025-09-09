@@ -25,3 +25,9 @@ class PurchaseRequest(models.Model):
 
     # You no longer need to override the create and write methods!
     # @api.constrains handles both scenarios automatically.
+
+    # Field-level group restriction for header total amount
+    estimated_cost = fields.Monetary(
+        groups="purchase_request.group_purchase_request_manager,base.group_system",
+        readonly=True,
+    )

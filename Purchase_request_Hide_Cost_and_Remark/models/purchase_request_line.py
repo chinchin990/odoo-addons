@@ -33,6 +33,18 @@ class PurchaseRequestLine(models.Model):
         tracking=False  # Disable field tracking to avoid mail tracking errors
     )
 
+    # Field-level group restrictions (hide from non-managers universally)
+    unit_price = fields.Monetary(
+        string="Unit Price",
+        groups="purchase_request.group_purchase_request_manager,base.group_system",
+    )
+
+    # Total Price (estimated_cost): keep compute from upstream, but restrict visibility
+    estimated_cost = fields.Monetary(
+        groups="purchase_request.group_purchase_request_manager,base.group_system",
+        readonly=True,
+    )
+
     @api.onchange('product_id')
     def onchange_product_id(self):
         """Override onchange_product_id to handle cases with an empty product_id"""

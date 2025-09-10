@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="view_purchase_request_form_inherit_supplier_column" model="ir.ui.view">
+      <field name="name">purchase.request.form.inherit.supplier.column</field>
+      <field name="model">purchase.request</field>
+      <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+      <field name="arch" type="xml">
+        <!-- Insert custom text Supplier column before Total Price in embedded product lines tree -->
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='estimated_cost']" position="before">
+          <field name="x_supplier" string="Supplier" groups="purchase_request.group_purchase_request_manager"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <templates xml:space="preserve">
+    <t t-inherit="mail.ChatterTopbar" t-inherit-mode="extension" owl="1">
+      <!-- 隐藏 Send Message 按钮 -->
+      <xpath expr="//button[contains(@class, 'o_ChatterTopbar_buttonSendMessage')]" position="attributes">
+        <attribute name="style">display:none !important;</attribute>
+      </xpath>
+    </t>
+  </templates>
+</odoo>

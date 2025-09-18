@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <!-- Standalone PR line tree column toggles -->
+    <record id="purchase_request_line_tree_optional_columns_unified" model="ir.ui.view">
+      <field name="name">purchase.request.line.tree.optional.columns.unified</field>
+      <field name="model">purchase.request.line</field>
+      <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
+      <field name="arch" type="xml">
+        <xpath expr="//tree/field[@name='request_id']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='request_state']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='requested_by']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='assigned_to']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='date_required']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='estimated_cost']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='purchased_qty']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='purchase_state']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='product_id']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='name']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='product_qty']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <!-- product_uom_id may appear with/without groups -->
+        <xpath expr="//tree/field[@name='product_uom_id']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//tree/field[@name='analytic_distribution']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <!-- If supplier column exists in this tree (base view has supplier_id) -->
+        <xpath expr="//tree/field[@name='supplier_id']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
+

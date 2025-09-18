@@ -166,6 +166,22 @@ class PurchaseRequestLine(models.Model):
             price = line.unit_price or 0.0
             line.estimated_cost = qty * price
 
+    # 👉 新增：当选择产品时，自动带出成本价
+    @api.onchange("product_id")
+    def _onchange_product_id_set_cost(self):
+        for line in self:
+            if line.product_id:
+                line.unit_price = line.product_id.standard_price
+
+    # 👉 新增：在后台/导入数据时也自动写入成本价
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("product_id") and not vals.get("unit_price"):
+                product = self.env["product.product"].browse(vals["product_id"])
+                vals["unit_price"] = product.standard_price
+        return super().create(vals_list)
+
     def write(self, vals):
         # Only capture qty changes for audit log (no unit price logging)
         track_qty = "product_qty" in vals

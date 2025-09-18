@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <!-- Optional checkbox for Unit Price in standalone PR line tree (added by dept approval) -->
+    <record id="pr_line_tree_unit_price_optional" model="ir.ui.view">
+      <field name="name">purchase.request.line.tree.unit.price.optional</field>
+      <field name="model">purchase.request.line</field>
+      <field name="inherit_id" ref="purchase_request_department_approval.purchase_request_line_tree_inherit_prices"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='unit_price']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
+

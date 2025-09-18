@@ -44,19 +44,18 @@
 
         </field>
     </record>
-
-    <!-- Safe RFQ restriction: standalone inherit, match by button action -->
+    <!-- Disable Create RFQ button in UI for PR Users and Department Managers -->
     <record id="view_purchase_request_form_inherit_rfq_restrict" model="ir.ui.view">
         <field name="name">purchase.request.form.inherit.rfq.restrict</field>
         <field name="model">purchase.request</field>
         <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
         <field name="priority" eval="120"/>
         <field name="arch" type="xml">
-            <xpath expr="//header/button[@type='action' and contains(@name, 'action_purchase_request_line_make_purchase_order')]" position="attributes">
-                <attribute name="groups">purchase_request.group_purchase_request_manager,base.group_system</attribute>
-                <attribute name="attrs">{'invisible': [('state','not in',('approved','in_progress'))]}</attribute>
-            </xpath>
-        </field>
+        <xpath expr="//button[@name='%(purchase_request.action_purchase_request_line_make_purchase_order)d']" position="attributes">
+            <!-- 只允许 System Admin 和 Purchase Request Manager 看得到 -->
+            <attribute name="groups">base.group_system,purchase_request.group_purchase_request_manager</attribute>
+        </xpath>
+    </field>
     </record>
 
     <!-- Disable line add/edit in UI for PR Users and Department Managers -->
@@ -98,7 +97,7 @@
         <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
         <field name="priority" eval="100"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='line_ids']/tree/field[@name='product_qty']" position="after">
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='estimated_cost']" position="before">
                 <field name="unit_price" widget="monetary"/>
             </xpath>
             <xpath expr="//field[@name='line_ids']/tree/field[@name='estimated_cost']" position="attributes">
@@ -142,7 +141,7 @@
         <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
         <field name="priority" eval="100"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='product_qty']" position="after">
+            <xpath expr="//field[@name='estimated_cost']" position="before">
                 <field name="unit_price" widget="monetary"/>
             </xpath>
             <xpath expr="//field[@name='estimated_cost']" position="attributes">

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Purchase Request Hide Cost and Remark',
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.1.0',
     # 关键改动：添加了对 purchase_request_department_approval 模块的依赖，确保加载顺序正确
     'depends': [
         'purchase',
@@ -24,6 +24,7 @@
     'data': [
         'views/purchase_request_views.xml',
         'views/purchase_request_lines_views.xml',
+        'views/product_views.xml',
     ],
     'installable': True,
     'application': False,

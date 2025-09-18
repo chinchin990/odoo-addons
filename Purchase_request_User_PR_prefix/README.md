@@ -1,17 +1,16 @@
-# Purchase Request User PR Prefix & Auto Number
+# Purchase Request - User PR Prefix
 
-[English] | [中文说明](README.zh.md)
+[English] | [中文](README.zh.md)
 
-Adds a PR Prefix on users and generates Purchase Request numbers with that prefix and year-based sequences.
+Apply a user/company-specific prefix to Purchase Request numbers for easier identification and sorting.
 
 ## Features
-- Per-user PR Prefix field (e.g., `K1-WH-PR-`)
-- Auto number format: `PREFIXYYYY-####` (e.g., `K1-WH-PR-2025-0001`)
-- Yearly sequence reset
-- Works with OCA `purchase_request`
-- Used by other modules (e.g., department approval) to partition data by prefix
+- Adds a configurable prefix to PR name/sequence based on user or company rules.
+- Works with existing PR naming; does not break references.
 
 ## Installation
-- Dependencies: `base`, `purchase_request`
-- Install via Apps; set each user’s PR Prefix in Access Rights
+- Odoo 17; depends on `purchase_request`.
+
+## Notes
+- Combine with department approval or other PR modules without conflict.
 

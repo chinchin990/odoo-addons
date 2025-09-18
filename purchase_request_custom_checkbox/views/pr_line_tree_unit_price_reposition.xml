@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <!-- Reposition Unit Price before Total Price in standalone PR line tree -->
+    <record id="pr_line_tree_unit_price_reposition" model="ir.ui.view">
+      <field name="name">purchase.request.line.tree.unit.price.reposition</field>
+      <field name="model">purchase.request.line</field>
+      <field name="inherit_id" ref="purchase_request.purchase_request_line_tree"/>
+      <field name="arch" type="xml">
+        <!-- Remove existing unit_price column (added by other modules) -->
+        <xpath expr="//tree/field[@name='unit_price']" position="replace"/>
+        <!-- Insert unit_price before estimated_cost -->
+        <xpath expr="//tree/field[@name='estimated_cost']" position="before">
+          <field name="unit_price" widget="monetary"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
+

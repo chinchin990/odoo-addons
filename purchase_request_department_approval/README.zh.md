@@ -1,56 +1,57 @@
-# 采购申请部门审批
+# 采购申请 - 部门审批
 
-[英文版](README.md) | 中文说明
+[中文] | [English](README.md)
 
-## 概述
-本模块在标准采购申请流程中新增“部门审批”和“采购核验”两个关键环节，并扩展行项目价格字段：新增单价（Unit Price），将总价（Total Price）改为按“数量 × 单价”自动计算。同时新增“Reason（采购目的）”字段，并在特定状态下限制编辑权限与 PR 编号修改权限。
+在 OCA 采购申请基础上增加“部门审批”流，并基于用户前缀（pr_prefix）做权限隔离，提供状态门控、按钮可见性以及行价格与理由等易用性增强。
 
 ## 主要功能
-- 流程与状态：
-  - 新增状态：`To be Dept. Approved（待部门审批）`、`To be Purchasing Verify（待采购核验）`
-  - 流程：Draft → To be Dept. Approved → To be Purchasing Verify → To be Approved → Approved → In progress → Done/Rejected
-- 按钮：
-  - Department Approve：在“待部门审批”由部门采购经理点击，流转至“待采购核验”
-  - Purchasing Verify：在“待采购核验”由采购申请管理员点击，流转至“待审批”
-- 行价格：
-  - 新增 `Unit Price` 单价（可编辑）
-  - `Total Price`（原 Estimated Cost）：只读、存储字段，自动计算 = 数量 × 单价
-  - 新增 `Reason`（采购目的）文本字段
-- 编辑限制：
-  - 在 `To be Purchasing Verify` 状态，采购申请用户与部门采购经理不可修改记录
-  - 限制两类用户修改 PR 编号（界面只读 + 服务器端拦截）
-- 日志增强：
-  - 修改行的数量或单价时，会在 Chatter 中记录修改人以及变更前后值
+- 审批流程
+  - 新增中间状态：`to_be_dept_approved`（部门审批）、`to_purchasing_verify`（采购核验）。
+  - 重排 `state` 选项，保留原有状态；在进入 Approved 时记录 `approved_date`。
 
-## 界面改动
-- PR 表单（明细树）：
-  - 在“数量”后显示“单价（Unit Price）”
-  - 将“Estimated Cost”列名改为“Total Price”
-  - 可选显示“Reason（采购目的）”列
-  - 页脚合计标签由“Estimated Cost”改为“Total Price”
-- PR 行表单：
-  - 新增“Unit Price”“Reason”，并显示只读的“Total Price”
-- 状态栏：
-  - 增加并显示 `To be Purchasing Verify` 状态
+- 按钮与状态门控
+  - 草稿 → 部门审批：`button_to_approve` 校验通过后进入 `to_be_dept_approved`。
+  - 部门审批：`button_dept_approve`（部门采购经理）进入 `to_purchasing_verify`。
+  - 采购核验：`button_purchasing_verify`（PR 经理）复核后进入 `to_approve`。
+  - 页眉按钮按状态与用户组控制显示。
+  - 创建询价单（Create RFQ）：仅在 `approved`/`in_progress` 时可见，且限系统管理员+PR 经理。
 
-## 权限与访问
-- 组：
-  - Department Purchase Manager：可进行部门审批
-  - Purchase Request Manager：可进行采购核验与后续审批
-- 限制：
-  - 采购申请用户与部门采购经理不可修改 PR 编号
-  - 服务器写入限制：在 `to_purchasing_verify`、`to_approve`、`approved`、`in_progress`、`done`、`rejected` 状态禁止上述两类用户修改
+- 校验逻辑
+  - 禁止含“数量>0 且无产品”的行进入审批。
+  - 要求至少存在“未取消、且有产品与数量>0”的有效行（复用 OCA 校验）。
+  - 在 `to_be_dept_approved` 与 `to_purchasing_verify` 阶段将单据只读（`is_editable=False`）。
 
-## 安装与配置
-依赖：`purchase_request`、`purchase_request_user_pr_prefix`
+- 前缀（pr_prefix）权限隔离
+  - 新增组：Department Purchase Manager（隐含 PR User）。
+  - 记录规则基于 `requested_by.pr_prefix`：
+    - 部门采购经理：本前缀内（或本人为申请人）可读写删增。
+    - PR User：本前缀内仅可读。
+    - 关注者（followers）规则：在 PR 与 PR 行上均收紧到相同前缀。
 
-1. 为用户设置 PR Prefix：设置 → 用户与公司 → 用户 → PR Prefix
-2. 将相应用户加入“Department Purchase Manager”组
+- 非经理编辑限制
+  - 对 PR User 与 Dept Manager（非 PR Manager）在以下状态禁止修改：
+    `to_purchasing_verify`、`to_approve`、`approved`、`in_progress`、`done`、`rejected`。
+  - 服务器端禁止修改 PR 编号（`name`）。
 
-## 备注
-- 若配套有“隐藏成本”模块，页面上“Total Price”的显示仍受该模块的组权限控制
-- 已在 Odoo 17 与 OCA `purchase_request` 17.0 上测试
+- 明细价格与理由增强
+  - 增加 `unit_price` 字段；`estimated_cost` 改为“总价（Total Price）= 数量 × 单价”。
+  - 产品变更与创建时自动带入 `standard_price` 作为 `unit_price`（若未填写）。
+  - 增加 `reason`（文本）字段；在表单/树视图展示。
+  - 视图中将 `unit_price` 放在 `estimated_cost` 之前，并将标签改为“Total Price”。
 
-## 许可
-AGPL-3
+## 视图概览
+- 表单：扩展状态条；增加核准日期；强制 `requested_by` 只读。
+- 页眉：按状态/角色显示“重置/部门审批/采购核验”；RFQ 按钮限权且按状态可见。
+- 明细（内嵌树）：插入“单价（Unit Price）”“理由（Reason）”，重命名/重排总价列。
+- 明细表单：显示 Reason；Unit Price 在 Total Price 之前；标签同步。
+- PR 编号：对 PR User 与 Dept Manager 只读。
+
+## 安装
+- Odoo 17；依赖：
+  - `purchase_request`
+  - `purchase_request_user_pr_prefix`（提供用户的 pr_prefix 用于记录规则）
+
+## 说明与兼容
+- 可与其它 PR 扩展（价格可见性、列可选、Supplier 列等）配合使用。
+- 如全局隐藏非经理价格，请确保各模块的 `groups` 与字段权限一致。
 

@@ -1,63 +1,57 @@
-# Purchase Request Department Approval
+# Purchase Request - Department Approval
 
-[English] | [中文说明](README.zh.md)
+[English] | [中文](README.zh.md)
 
-Department-level approval workflow and line pricing extensions for Odoo 17 Purchase Requests.
-
-## Overview
-This module adds an intermediate department approval step and extends Purchase Request Lines with Unit Price, computed Total Price, and a Reason field. It also introduces a purchasing verification state and stricter editing rules.
+Adds a department-level review flow on top of OCA Purchase Request, with prefix‑based access control, state gating, button visibility, and line price conveniences.
 
 ## Key Features
-- New states and flow:
-  - `To be Dept. Approved` (department approval step)
-  - `To be Purchasing Verify` (purchasing verification step)
-  - Flow: Draft → To be Dept. Approved → To be Purchasing Verify → To be Approved → Approved → In progress → Done/Rejected
-- New button actions:
-  - Department Approve: moves to `To be Purchasing Verify` (no line validation; visible to Department Purchase Manager on dept step)
-  - Purchasing Verify: validates lines and moves to `To be Approved` (visible to Purchase Request Manager on verify step)
-- Line pricing fields:
-  - Unit Price (new): editable monetary field on `purchase.request.line`
-  - Total Price: renamed from Estimated Cost and now computed = Quantity × Unit Price; read-only, stored
-  - Reason (new): free-text purpose for the line
-- Edit restrictions:
-  - PR User and Department Purchase Manager cannot edit records in `To be Purchasing Verify`
-  - PR Number (name) cannot be modified by PR User and Department Purchase Manager (enforced by view and server-side)
-- Chatter logging:
-  - When Quantity or Unit Price changes on lines, a note is posted indicating the user and the before → after values
-- Visibility by department:
-  - Existing group and record rules keep visibility restricted by PR Prefix
+- Workflow states
+  - Adds `to_be_dept_approved` and `to_purchasing_verify` between Draft → Approval → Approved.
+  - Enforces order by redefining the `state` selection (keeps original states).
+  - `approved_date` timestamp is stored (readonly) when a request becomes Approved.
 
-## UI Changes
-- PR form (lines tree):
-  - Shows Unit Price next to Quantity
-  - Estimated Cost column label changed to “Total Price”
-  - Optional Reason column (can be toggled via list view columns)
-  - Footer subtotal label changed to “Total Price”
-- PR Line form:
-  - Adds Unit Price and Reason; Total Price label shown and read-only
-- Status bar on PR:
-  - Displays the new `To be Purchasing Verify` step
+- Buttons & state gating
+  - Draft → Dept Approve: `button_to_approve` moves to `to_be_dept_approved` after validations.
+  - Dept Approve: `button_dept_approve` (Department Purchase Manager) moves to `to_purchasing_verify`.
+  - Purchasing Verify: `button_purchasing_verify` (PR Manager) validates again and moves to `to_approve`.
+  - Header buttons are shown only in the relevant state and for the proper groups.
+  - Create RFQ: visible only in `approved`/`in_progress`; restricted to System Admin + PR Manager.
 
-## Security and Access
-- Groups:
-  - Department Purchase Manager: department approval
-  - Purchase Request Manager: purchasing verification and subsequent approvals
-- Restrictions:
-  - PR User and Department Purchase Manager cannot modify PR Number
-  - Server-side write guard blocks edits for those groups in `to_purchasing_verify`, `to_approve`, `approved`, `in_progress`, `done`, `rejected`
+- Validations
+  - Forbid lines with qty > 0 and no product when sending to approval.
+  - Require at least one valid non‑cancelled line with product and qty > 0 (reuses OCA checks).
+  - During `to_be_dept_approved` and `to_purchasing_verify`, the request becomes readonly (`is_editable = False`).
+
+- Access control (prefix‑based)
+  - New group: Department Purchase Manager, implied by PR User.
+  - Record rules by `requested_by.pr_prefix`:
+    - Dept Managers: full access within their prefix; also if requester is self.
+    - PR Users: read‑only within their prefix.
+    - Follower rules tightened to same prefix for both PR and PR Line.
+
+- Edit locks for non‑managers
+  - For PR Users and Dept Managers (not PR Managers), block edits in states: `to_purchasing_verify`, `to_approve`, `approved`, `in_progress`, `done`, `rejected`.
+  - Prevent PR number (`name`) changes via server‑side guard.
+
+- Line price & reason enhancements
+  - Adds `unit_price` to PR lines; `estimated_cost` becomes a computed "Total Price" = qty × unit_price.
+  - Auto‑fill `unit_price` from product cost on product change and at create if missing.
+  - Adds `reason` (text) on PR line; exposed in form/tree.
+  - In views, `unit_price` is placed before `estimated_cost` for readability; labels adjusted to "Total Price".
+
+## Views Overview
+- Form: extended statusbar; added Approved Date; `requested_by` forced readonly.
+- Header: state‑aware buttons for Reset/Dept Approve/Purchasing Verify; RFQ button restricted.
+- Lines (embedded tree): inserts Unit Price (before Total Price), Reason, relabels Estimated Cost.
+- Line form: shows Reason; Unit Price before Total Price; relabel applies.
+- PR number readonly for PR Users and Dept Managers.
 
 ## Installation
-Dependencies: `purchase_request`, `purchase_request_user_pr_prefix`.
+- Odoo 17; depends on:
+  - `purchase_request`
+  - `purchase_request_user_pr_prefix` (provides `pr_prefix` on users used by record rules)
 
-Install from Apps (Developer Mode) or via command: `-i purchase_request,purchase_request_user_pr_prefix,purchase_request_department_approval`.
+## Notes & Compatibility
+- Designed to work alongside other PR extensions (price visibility, custom checkboxes, supplier column, etc.).
+- If you also hide prices for non‑managers globally, ensure view groups/field groups are consistent across modules.
 
-## Configuration
-1. Set each user’s PR Prefix: Settings → Users & Companies → Users → PR Prefix
-2. Assign department managers to group: “Department Purchase Manager”
-
-## Notes
-- If using the companion customization to hide costs, the Total Price label change is respected; visibility still depends on that module’s group rules.
-- Tested with Odoo 17 and OCA `purchase_request` 17.0.
-
-## License
-AGPL-3

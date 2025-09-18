@@ -1,16 +1,17 @@
-# Purchase Request Clean Empty Product
+# Purchase Request - Clean Empty Product Lines
 
-[English] | [中文说明](README.zh.md)
+[English] | [中文](README.zh.md)
 
-Automatically removes purchase request lines that do not have a product selected. Keeps requests clean and consistent by filtering out empty product lines on create/write.
+Prevent or clean empty product lines in Purchase Requests to keep data consistent and avoid downstream errors.
 
 ## Features
-- Cleans lines with missing `product_id` during create and write
-- Supports all one2many command formats (0,1,2,3,4,5,6)
-- Works silently without interrupting users
-- Compatible with OCA `purchase_request`
+- Blocks/cleans PR lines with missing `product_id` or zero/invalid quantity (implementation‑specific).
+- Safer create/edit flows for PR lines.
+- Optional tweaks to display names to avoid errors when product is absent.
 
 ## Installation
-- Dependency: `purchase_request`
-- Install via Apps or CLI; no configuration required
+- Odoo 17; depends on `purchase_request`.
+
+## Notes
+- Works alongside other PR modules; no price or approval logic is changed.
 

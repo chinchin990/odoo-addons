@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Restrict Sales Price and Cost visibility on Product Template (main form) -->
+    <record id="product_template_form_price_groups" model="ir.ui.view">
+      <field name="name">product.template.form.price.groups</field>
+      <field name="model">product.template</field>
+      <field name="inherit_id" ref="product.product_template_only_form_view"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='list_price']" position="attributes">
+          <attribute name="groups">purchase.group_purchase_manager,base.group_system</attribute>
+        </xpath>
+        <xpath expr="//field[@name='standard_price']" position="attributes">
+          <attribute name="groups">purchase.group_purchase_manager,base.group_system</attribute>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Restrict on alternative product template form if used -->
+    <record id="product_template_form_alt_price_groups" model="ir.ui.view">
+      <field name="name">product.template.form.alt.price.groups</field>
+      <field name="model">product.template</field>
+      <field name="inherit_id" ref="product.product_template_form_view"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='list_price']" position="attributes">
+          <attribute name="groups">purchase.group_purchase_manager,base.group_system</attribute>
+        </xpath>
+        <xpath expr="//field[@name='standard_price']" position="attributes">
+          <attribute name="groups">purchase.group_purchase_manager,base.group_system</attribute>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

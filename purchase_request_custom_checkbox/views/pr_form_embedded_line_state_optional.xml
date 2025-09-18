@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <!-- Optional checkbox for line_state badge in PR form embedded tree (added by reject module) -->
+    <record id="pr_form_embedded_line_state_optional" model="ir.ui.view">
+      <field name="name">purchase.request.form.line.state.optional</field>
+      <field name="model">purchase.request</field>
+      <field name="inherit_id" ref="purchase_request_line_reject.view_purchase_request_form_inherit_line_reject_btn"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='line_state']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
+

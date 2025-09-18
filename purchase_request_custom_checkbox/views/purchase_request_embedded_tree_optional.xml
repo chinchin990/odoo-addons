@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <!-- PR form: embedded product lines tree column toggles -->
+    <record id="view_purchase_request_form_embedded_tree_optional" model="ir.ui.view">
+      <field name="name">purchase.request.form.embedded.tree.optional</field>
+      <field name="model">purchase.request</field>
+      <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+      <field name="arch" type="xml">
+        <!-- Base columns in embedded tree -->
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='product_id']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='name']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='product_qty']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <!-- Apply to both occurrences of product_uom_id -->
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='product_uom_id']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='analytic_distribution']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='date_required']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <!-- Total Price (estimated_cost) keep label; only add optional -->
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='estimated_cost']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='currency_id']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='purchased_qty']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//field[@name='line_ids']/tree/field[@name='purchase_state']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <!-- Note: unit_price, x_supplier, line_state optional handled via their own inherit views -->
+      </field>
+    </record>
+  </data>
+</odoo>

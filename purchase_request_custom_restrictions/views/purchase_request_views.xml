@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+
+    <!--
+        Form view: Hide fields using the most robust method (groups attribute).
+        By setting groups="base.group_no_one", we ensure these fields are hidden
+        from ALL users, including administrators, overriding any other visibility rules.
+    -->
+    <record id="view_purchase_request_form_inherit_restrictions" model="ir.ui.view">
+      <field name="name">purchase.request.form.inherit.custom.restrictions</field>
+      <field name="model">purchase.request</field>
+      <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+      <field name="arch" type="xml">
+
+        <!-- 1. Relabel description field -->
+        <xpath expr="//field[@name='description']" position="attributes">
+          <attribute name="string">Purpose / Category of Purchase</attribute>
+        </xpath>
+
+        <!-- 2. Hide all specified fields by overriding their groups attribute -->
+        <xpath expr="//field[@name='assigned_to']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        <xpath expr="//field[@name='picking_type_id']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        <xpath expr="//field[@name='company_id']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        <xpath expr="//field[@name='origin']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        <xpath expr="//field[@name='group_id']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+
+      </field>
+    </record>
+
+    <!--
+        Tree view: Apply the same robust hiding method.
+        This will find any of these fields present in the tree view and hide them.
+    -->
+    <record id="view_purchase_request_tree_inherit_restrictions" model="ir.ui.view">
+      <field name="name">purchase.request.tree.inherit.custom.restrictions</field>
+      <field name="model">purchase.request</field>
+      <field name="inherit_id" ref="purchase_request.view_purchase_request_tree"/>
+      <field name="arch" type="xml">
+
+        <xpath expr="//field[@name='company_id']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        <xpath expr="//field[@name='origin']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        <xpath expr="//field[@name='group_id']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        <xpath expr="//field[@name='assigned_to']" position="attributes">
+            <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        <xpath expr="//field[@name='picking_type_id']" position="attributes">
+            <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+        
+      </field>
+    </record>
+  </data>
+</odoo>
